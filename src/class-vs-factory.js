@@ -3,6 +3,10 @@
  *  -Encapsulation - When using factory function, only the methods we expose are public, everything else is encapsulated.
  *  When using classes everything is public.
  *  -No more 'this', so no more 'this' losing context problems (which are annoying and a source of bugs!)
+ *  -Forces you to use Composition to reuse common functionality (as you can't do inheritance with factory functions)
+ *
+ * Disadvantages:
+ *  -Consumes more memory (classes use prototypes, so shared instances), only will be noticable if creating thousands of objects though
  */
 
 console.log("\n CLASS VS FACTORY");
@@ -43,22 +47,3 @@ c.liftHeavy();
 
 let ff = weightLifter("Factory Function");
 ff.liftHeavy();
-
-// Factory Function
-function WeightLifter2(name) {
-  const trainsHard = () => {
-    console.log(`${name} trains hard`);
-  };
-
-  const liftHeavy = () => {
-    console.log(`${name} lifts heavy`);
-  };
-
-  return Object.freeze({
-    trainsHard: trainsHard,
-    liftHeavy: liftHeavy
-  });
-};
-
-let ff2 = new WeightLifter2("Factory Function 2");
-ff2.liftHeavy();
