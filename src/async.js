@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 
 console.log("\n ASYNC");
 
-async function fetchUsers(userID) {
+async function fetchCats(userID) {
   let response = await fetch(`http://catappapi.herokuapp.com/users/${userID}`);
   let data = await response.json();
 
@@ -17,7 +17,7 @@ async function fetchUsers(userID) {
   return catNames;*/
 
   // we could use promises here instead
-  return Promise.all(
+  let results = await Promise.all(
     data.cats.map(async function(catID) {
       let response = await fetch(
         `http://catappapi.herokuapp.com/cats/${catID}`
@@ -26,13 +26,17 @@ async function fetchUsers(userID) {
       return data.name;
     })
   )
+
+  return results;
 }
 
-fetchUsers(123).then(results => {
-  console.log("results", results);
+fetchCats(123).then(results => {
+  console.log("Cat Results: ", results);
 });
 
-//Example of iterating sequentially with Promises but can see that await it much nicer
+/**
+ * Example of iterating sequentially with Promises but can see that await it much nicer
+ */
 const getAllUsers = new Promise((resolve, reject) => {
   setTimeout(resolve(["sarah", "laura", "andrew"]), 1000);
 });
@@ -62,26 +66,30 @@ getAllUsers.then(async function(users) {
 });
 
 /**
- * TIMEOUTS - THERE IS NO POINT TO THIS! CAN DO WITH JUST
- * makeTimeoutPromise().then(_ => {
-   console.log("makeTimeoutPromise finished");
- });
+ * Rejecting promises can be handled by throwing errors or Promise.reject
+ * It will be handledby the reject method if defined, otherwise the catch
  */
-const makeTimeoutPromise = () => {
-  return new Promise((resolve, reject) => {
-    setTimeout(resolve, 1000)
-  });
+function job() {
+    return new Promise(function(resolve, reject) {
+        setTimeout(reject, 500, 'Error happened');
+    });
 }
 
-async function timeoutExample()
-{
-  await makeTimeoutPromise();
+async function test() {
+    try {
+        let message = await job();
+        console.log(message);
+        return 'Hello world';
+    }
+    catch (error)
+    {
+        console.error(error);
+
+        //throw new Error('throw - Error happened during test');
+        return Promise.reject('Promise.reject - Error happened during test');
+    }
 }
 
-timeoutExample().then(_ => {
-  console.log("timeout finished");
-});
-
-makeTimeoutPromise().then(_ => {
-  console.log("makeTimeoutPromise finished");
-});
+test()
+.then(message => { console.log(message) }, error => { console.log("Error handler:" + error) })
+.catch(error => { console.log("Catch:" + error) });
