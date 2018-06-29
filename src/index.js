@@ -8,4 +8,4 @@ require("./proxies");
 require("./class-vs-factory");
 //require("./promises");
 require("./async");
-//require("./generators");
+require("./generators");
